@@ -2,78 +2,257 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Battery Master Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battery Master // Hi-Tech Calculator</title>
     <style>
         :root {
-            --primary: #58a6ff;
-            --bg: #0d1117;
-            --surface: #161b22;
-            --text: #e6edf3;
-            --border: #30363d;
+            --bg: #030712;
+            --surface: #0b0f19;
+            --surface-glass: rgba(11, 15, 25, 0.7);
+            --border: #1e293b;
+            --border-glow: #38bdf8;
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.4);
+            --accent: #f43f5e;
+            --text: #f8fafc;
+            --text-muted: #64748b;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background-color: var(--bg);
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(244, 63, 94, 0.05) 0%, transparent 40%);
             color: var(--text);
             display: flex;
             justify-content: center;
-            padding: 40px 20px;
+            align-items: center;
+            min-height: 100vh;
             margin: 0;
+            padding: 15px;
+            box-sizing: border-box;
         }
 
         .card {
-            background: var(--surface);
-            padding: 30px;
-            border-radius: 16px;
+            background: var(--surface-glass);
+            backdrop-filter: blur(12px);
+            padding: 25px;
+            border-radius: 12px;
             border: 1px solid var(--border);
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 550px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(56, 189, 248, 0.03);
+            box-sizing: border-box;
+            position: relative;
         }
 
-        h1 { font-size: 24px; margin-bottom: 25px; text-align: center; color: var(--primary); }
+        /* Декоративні хайтек куточки */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: -1px;
+            width: 10px; height: 10px;
+            border-top: 2px solid var(--primary);
+            border-left: 2px solid var(--primary);
+        }
+        .card::after {
+            content: '';
+            position: absolute;
+            bottom: -1px; right: -1px;
+            width: 10px; height: 10px;
+            border-bottom: 2px solid var(--primary);
+            border-right: 2px solid var(--primary);
+        }
 
-        .group { margin-bottom: 20px; }
-        label { display: block; font-size: 13px; color: #8b949e; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+        h1 { 
+            font-size: 18px; 
+            margin-top: 0; 
+            margin-bottom: 20px; 
+            text-align: center; 
+            color: var(--primary); 
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
 
-        .radio-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .group { margin-bottom: 15px; }
+        
+        label { 
+            display: block; 
+            font-size: 11px; 
+            color: var(--text-muted); 
+            margin-bottom: 6px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+        }
+
+        .radio-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 8px; 
+        }
+
         .radio-opt { 
-            background: #010409; padding: 10px; border: 1px solid var(--border); 
-            border-radius: 8px; text-align: center; cursor: pointer; font-size: 13px;
+            background: #020617; 
+            padding: 10px 6px; 
+            border: 1px solid var(--border); 
+            border-radius: 6px; 
+            text-align: center; 
+            cursor: pointer; 
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            user-select: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-muted);
         }
+
         input[type="radio"] { display: none; }
-        input[type="radio"]:checked + .radio-opt { border-color: var(--primary); background: #1f2937; color: var(--primary); }
+        
+        input[type="radio"]:checked + .radio-opt { 
+            border-color: var(--primary); 
+            background: rgba(56, 189, 248, 0.1); 
+            color: var(--primary); 
+            box-shadow: 0 0 12px var(--primary-glow);
+            font-weight: 600;
+        }
+
+        .row-inputs { 
+            display: flex; 
+            gap: 10px; 
+        }
+
+        .row-inputs .group { 
+            flex: 1; 
+        }
 
         input[type="number"] { 
-            width: 100%; padding: 12px; background: #010409; border: 1px solid var(--border); 
-            border-radius: 8px; color: white; box-sizing: border-box; font-size: 16px; 
+            width: 100%; 
+            padding: 10px 12px; 
+            background: #020617; 
+            border: 1px solid var(--border); 
+            border-radius: 6px; 
+            color: var(--primary); 
+            box-sizing: border-box; 
+            font-size: 16px; 
+            font-family: monospace;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
         }
 
         .result-panel { 
-            background: linear-gradient(145deg, #1c2128, #161b22);
-            padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-top: 25px;
+            background: linear-gradient(135deg, rgba(2, 6, 23, 0.9), rgba(11, 15, 25, 0.9));
+            padding: 15px; 
+            border-radius: 8px; 
+            border: 1px solid var(--border); 
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
         }
-        .res-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
-        .res-val { color: var(--primary); font-weight: bold; }
+
+        .result-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 3px; height: 100%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .res-row { 
+            display: flex; 
+            justify-content: space-between; 
+            margin-bottom: 8px; 
+            font-size: 13px; 
+        }
+
+        .res-row:last-child { margin-bottom: 0; }
+        
+        .res-val { 
+            color: var(--primary); 
+            font-weight: bold; 
+            font-family: monospace;
+            text-shadow: 0 0 8px var(--primary-glow);
+        }
 
         .viz-box { 
-            margin-top: 20px; padding: 20px; background: #010409; 
-            border-radius: 8px; display: flex; justify-content: center; overflow-x: auto;
+            margin-top: 20px; 
+            padding: 15px; 
+            background: #020617; 
+            border-radius: 8px; 
+            border: 1px solid var(--border);
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            overflow-x: auto; 
+            gap: 6px; 
+            min-height: 80px; 
+            justify-content: center;
         }
-        .cell { width: 30px; height: 50px; background: #21262d; border: 2px solid var(--primary); border-radius: 4px; margin: 2px; }
 
-        footer { margin-top: 30px; font-size: 12px; text-align: center; color: #586067; }
-        footer a { color: var(--primary); text-decoration: none; }
+        .battery-row { 
+            display: flex; 
+            gap: 6px; 
+            align-items: center; 
+        }
+
+        .cell { 
+            width: 20px; 
+            height: 34px; 
+            background: rgba(56, 189, 248, 0.05); 
+            border: 1px solid var(--primary); 
+            border-radius: 3px; 
+            flex-shrink: 0;
+            box-shadow: inset 0 0 5px var(--primary-glow);
+            position: relative;
+        }
+
+        /* Клема акумулятора */
+        .cell::after {
+            content: '';
+            position: absolute;
+            top: -3px; left: 6px;
+            width: 6px; height: 2px;
+            background: var(--primary);
+        }
+
+        footer { 
+            margin-top: 20px; 
+            font-size: 11px; 
+            text-align: center; 
+            color: var(--text-muted); 
+            letter-spacing: 0.5px;
+        }
+
+        footer a { 
+            color: var(--primary); 
+            text-decoration: none; 
+            transition: text-shadow 0.2s;
+        }
+
+        footer a:hover { 
+            text-shadow: 0 0 8px var(--primary-glow);
+        }
+
+        @media (max-width: 380px) {
+            .card { padding: 15px; }
+            .radio-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h1>Battery Calculator</h1>
+    <h1>// SYS_BATTERY_CALC</h1>
 
     <div class="group">
-        <label>Тип акумулятора:</label>
+        <label>Хімічний прототип:</label>
         <div class="radio-grid">
             <label><input type="radio" name="chem" value="liion" checked onchange="calc()"> <div class="radio-opt">Li-ion</div></label>
             <label><input type="radio" name="chem" value="lifepo4" onchange="calc()"> <div class="radio-opt">LiFePO4</div></label>
@@ -81,24 +260,34 @@
         </div>
     </div>
 
-    <div class="group">
-        <label>Кількість S (послідовно):</label>
-        <input type="number" id="s" value="4" min="1" oninput="calc()">
+    <div class="row-inputs">
+        <div class="group">
+            <label>Послідовно [S]:</label>
+            <input type="number" id="s" value="4" min="1" oninput="calc()">
+        </div>
+        <div class="group">
+            <label>Паралельно [P]:</label>
+            <input type="number" id="p" value="1" min="1" oninput="calc()">
+        </div>
     </div>
+
     <div class="group">
-        <label>Кількість P (паралельно):</label>
-        <input type="number" id="p" value="1" min="1" oninput="calc()">
+        <label>Ємність елемента [mAh]:</label>
+        <input type="number" id="capacity" value="2500" min="1" step="100" oninput="calc()">
     </div>
 
     <div class="result-panel">
-        <div class="res-row"><span>Напруга:</span> <span id="v" class="res-val">12.8 V</span></div>
-        <div class="res-row"><span>Всього елементів:</span> <span id="total" class="res-val">4</span></div>
+        <div class="res-row"><span>Конфігурація:</span> <span id="config" class="res-val">4S 1P</span></div>
+        <div class="res-row"><span>Напруга збірки:</span> <span id="v" class="res-val">14.4 V</span></div>
+        <div class="res-row"><span>Загальна ємність:</span> <span id="totalCap" class="res-val">2.5 Ah</span></div>
+        <div class="res-row"><span>Загальна енергія:</span> <span id="totalWh" class="res-val">36 Wh</span></div>
+        <div class="res-row"><span>Всього елементів:</span> <span id="total" class="res-val">4 шт.</span></div>
     </div>
 
     <div class="viz-box" id="viz"></div>
 
     <footer>
-        Dima Lasun | <a href="https://github.com/dimon-qrz">GitHub</a> | <a href="https://www.facebook.com/groups/3145673675685047">Група FB</a>
+        Dima Lasun | <a href="https://github.com/dimon-qrz" target="_blank">GitHub</a> // <a href="https://www.facebook.com/groups/3145673675685047" target="_blank">FB Group</a>
     </footer>
 </div>
 
@@ -107,22 +296,47 @@
         const chem = document.querySelector('input[name="chem"]:checked').value;
         const s = parseInt(document.getElementById('s').value) || 1;
         const p = parseInt(document.getElementById('p').value) || 1;
+        const capMah = parseFloat(document.getElementById('capacity').value) || 0;
         
-        // Визначаємо номінал
         const rates = { liion: 3.6, lifepo4: 3.2, lead: 12.0 };
-        const voltage = (s * rates[chem]).toFixed(1);
+        const baseV = rates[chem];
+        const voltage = (s * baseV).toFixed(1);
         
+        const totalCapAh = (capMah * p) / 1000;
+        const totalWh = (totalCapAh * voltage).toFixed(1);
+
+        document.getElementById('config').innerText = `${s}S ${p}P`;
         document.getElementById('v').innerText = voltage + " V";
-        document.getElementById('total').innerText = (s * p);
+        document.getElementById('totalCap').innerText = totalCapAh >= 1 ? totalCapAh.toFixed(2) + " Ah" : capMah * p + " mAh";
+        document.getElementById('totalWh').innerText = totalWh + " Wh";
+        document.getElementById('total').innerText = (s * p) + " шт.";
         
-        // Візуалізація
         const viz = document.getElementById('viz');
         viz.innerHTML = '';
-        const limit = Math.min(s * p, 20);
-        for(let i=0; i<limit; i++) {
-            let div = document.createElement('div');
-            div.className = 'cell';
-            viz.appendChild(div);
+        
+        const maxDisplayS = 8;
+        const maxDisplayP = 8;
+        const renderS = Math.min(s, maxDisplayS);
+        const renderP = Math.min(p, maxDisplayP);
+
+        for (let i = 0; i < renderS; i++) {
+            let row = document.createElement('div');
+            row.className = 'battery-row';
+            for (let j = 0; j < renderP; j++) {
+                let cell = document.createElement('div');
+                cell.className = 'cell';
+                row.appendChild(cell);
+            }
+            viz.appendChild(row);
+        }
+
+        if (s > maxDisplayS || p > maxDisplayP) {
+            let hint = document.createElement('div');
+            hint.style.fontSize = '10px';
+            hint.style.color = 'var(--text-muted)';
+            hint.style.fontFamily = 'monospace';
+            hint.innerText = `[МАТРИЦЯ СКОРОЧЕНА: ${s}S × ${p}P]`;
+            viz.appendChild(hint);
         }
     }
     calc();
