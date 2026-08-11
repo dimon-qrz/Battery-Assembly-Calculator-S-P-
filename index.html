@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор збірки акумуляторів</title>
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --card-bg: #161b22;
+            --border-color: #30363d;
+            --text-color: #c9d1d9;
+            --accent-color: #58a6ff;
+            --accent-hover: #1f6feb;
+            --success-color: #238636;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            color: #f0f6fc;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .radio-group, .grid-inputs {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .radio-card {
+            flex: 1;
+            min-width: 130px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .radio-card input {
+            display: none;
+        }
+
+        .radio-card:has(input:checked) {
+            border-color: var(--accent-color);
+            background-color: rgba(88, 166, 255, 0.1);
+        }
+
+        .input-group {
+            flex: 1;
+            min-width: 200px;
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        input[type="number"], select {
+            width: 100%;
+            background-color: #010409;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .results-box {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+        }
+
+        .result-item {
+            font-size: 14px;
+        }
+
+        .result-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .visual-container {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            overflow-x: auto;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .battery-matrix {
+            display: inline-flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 10px;
+        }
+
+        .battery-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .cell {
+            width: 28px;
+            height: 44px;
+            background-color: #21262d;
+            border: 2px solid var(--accent-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--text-color);
+            position: relative;
+        }
+
+        .cell::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: 8px;
+            width: 8px;
+            height: 3px;
+            background-color: var(--accent-color);
+            border-radius: 1px;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #8b949e;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Калькулятор збірки акумуляторів (S/P)</h1>
+
+    <!-- Вибір хімії -->
+    <div class="section">
+        <label>Хімічний тип акумулятора:</label>
+        <div class="radio-group">
+            <label class="radio-card">
+                <input type="radio" name="chemistry" value="liion" checked onchange="updateChemistry()">
+                <div><strong>Li-ion</strong><div class="hint">3.6V / 4.2V</div></div>
+            </label>
+            <label class="radio-card">
+                <input type="radio" name="chemistry" value="lifepo4" onchange="updateChemistry()">
+                <div><strong>LiFePO4</strong><div class="hint">3.2V / 3.65V</div></div>
+            </label>
+            <label class="radio-card">
+                <input type="radio" name="chemistry" value="lead" onchange="updateChemistry()">
+                <div><strong>Свинець (Lead)</strong><div class="hint">2.0V / 2.35V</div></div>
+            </label>
+        </div>
+    </div>
+
+    <!-- Блок введення даних -->
+    <div class="section">
+        <div class="grid-inputs">
+            <div class="input-group">
+                <label for="seriesCount">Послідовно (S):</label>
+                <input type="number" id="seriesCount" value="4" min="1" max="100" oninput="calculateFromConfig()">
+            </div>
+            <div class="input-group">
+                <label for="parallelCount">Паралельно (P):</label>
+                <input type="number" id="parallelCount" value="1" min="1" max="100" oninput="calculateFromConfig()">
+            </div>
+            <div class="input-group">
+                <label for="targetVoltage">Бажана напруга (V):</label>
+                <input type="number" id="targetVoltage" value="14.4" step="0.1" min="0.5" max="500" oninput="calculateFromVoltage()">
+            </div>
+        </div>
+    </div>
+
+    <!-- Результати розрахунку -->
+    <div class="results-box">
+        <div class="results-grid">
+            <div class="result-item">
+                Номінальна напруга:
+                <div class="result-value" id="resNomVoltage">12.8 V</div>
+            </div>
+            <div class="result-item">
+                Максимальна (ряд):
+                <div class="result-value" id="resMaxVoltage">14.6 V</div>
+            </div>
+            <div class="result-item">
+                Конфігурація:
+                <div class="result-value" id="resConfig">4S 1P</div>
+            </div>
+            <div class="result-item">
+                Всього елементів:
+                <div class="result-value" id="resTotalCells">4 шт.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Візуалізація -->
+    <div class="section">
+        <label>Візуальна схема збірки:</label>
+        <div class="visual-container">
+            <div id="batteryMatrix" class="battery-matrix"></div>
+            <div class="hint" id="visualHint">Схема показує структуру з'єднань (рядки — послідовно, стовпчики — паралельно)</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Параметри хімічних типів
+    const chemistries = {
+        liion: { nom: 3.6, max: 4.2 },
+        lifepo4: { nom: 3.2, max: 3.65 },
+        lead: { nom: 2.0, max: 2.35 }
+    };
+
+    function getSelectedChemistry() {
+        const radios = document.getElementsByName('chemistry');
+        for (const r of radios) {
+            if (r.checked) return chemistries[r.value];
+        }
+        return chemistries.liion;
+    }
+
+    // Розрахунок при зміні кількості банок (S / P)
+    function calculateFromConfig() {
+        let s = parseInt(document.getElementById('seriesCount').value) || 1;
+        let p = parseInt(document.getElementById('parallelCount').value) || 1;
+        
+        if (s < 1) s = 1;
+        if (p < 1) p = 1;
+
+        const chem = getSelectedChemistry();
+        const nomV = (s * chem.nom).toFixed(2);
+        const maxV = (s * chem.max).toFixed(2);
+        const total = s * p;
+
+        document.getElementById('targetVoltage').value = nomV;
+        document.getElementById('resNomVoltage').innerText = nomV + ' V';
+        document.getElementById('resMaxVoltage').innerText = maxV + ' V';
+        document.getElementById('resConfig').innerText = s + 'S ' + p + 'P';
+        document.getElementById('resTotalCells').innerText = total + ' шт.';
+
+        renderVisual(s, p);
+    }
+
+    // Розрахунок при введені бажаної напруги
+    function calculateFromVoltage() {
+        const targetV = parseFloat(document.getElementById('targetVoltage').value) || 0;
+        const chem = getSelectedChemistry();
+        
+        let s = Math.round(targetV / chem.nom);
+        if (s < 1) s = 1;
+        
+        document.getElementById('seriesCount').value = s;
+        calculateFromConfig();
+    }
+
+    // Оновлення при зміні хімії
+    function updateChemistry() {
+        calculateFromConfig();
+    }
+
+    // Генерація візуальної матриці
+    function renderVisual(s, p) {
+        const container = document.getElementById('batteryMatrix');
+        container.innerHTML = '';
+
+        // Обмеження для стабільності відображення (щоб не вішати браузер при величезних числах)
+        const maxDisplayS = 10;
+        const maxDisplayP = 10;
+
+        const renderS = Math.min(s, maxDisplayS);
+        const renderP = Math.min(p, maxDisplayP);
+
+        for (let i = 0; i < renderS; i++) {
+            const row = document.createElement('div');
+            row.className = 'battery-row';
+            for (let j = 0; j < renderP; j++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                cell.innerText = `${i+1}:${j+1}`;
+                row.appendChild(cell);
+            }
+            container.appendChild(row);
+        }
+
+        if (s > maxDisplayS || p > maxDisplayP) {
+            const hint = document.createElement('div');
+            hint.className = 'hint';
+            hint.innerText = `*(Відображено скорочено. Повна збірка містить ${s} послідовних та ${p} паралельних блоків)*`;
+            container.appendChild(hint);
+        }
+    }
+
+    // Початковий розрахунок при завантаженні
+    calculateFromConfig();
+</script>
+
+</body> 
